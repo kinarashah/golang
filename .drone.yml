@@ -1,5 +1,6 @@
 ---
 kind: pipeline
+type: docker
 name: windows-go116-1809
 
 platform:
@@ -60,6 +61,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go116-20H2
 
 platform:
@@ -73,9 +75,9 @@ clone:
 
 steps:
   - name: clone
-    image: luthermonson/drone-git:windows-20H2-amd64
+    image: rancher/drone-images:git-20H2
   - name: docker-ci
-    image: luthermonson/drone-docker:20H2
+    image: rancher/drone-images:docker-20H2
     settings:
       dry_run: true
       purge: false
@@ -96,7 +98,7 @@ steps:
         - pull_request
 
   - name: docker-publish
-    image: luthermonson/drone-docker:20H2
+    image: rancher/drone-images:docker-20H2
     settings:
       purge: false
       context: 1.16/windows/windowsservercore-20H2
@@ -126,6 +128,74 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
+name: windows-go116-2022
+
+platform:
+  os: windows
+  arch: amd64
+  version: 2022
+
+# remove this and use upstream images when https://github.com/drone/drone-git/pull/25 is merged
+clone:
+  disable: true
+
+steps:
+  - name: clone
+    image: rancher/drone-images:git-amd64-ltsc2022
+  - name: docker-ci
+    image: rancher/drone-images:docker-amd64-ltsc2022
+    settings:
+      dry_run: true
+      purge: false
+      context: 1.16/windows/windowsservercore-ltsc2022
+      custom_dns: 1.1.1.1
+      dockerfile: 1.16/windows/windowsservercore-ltsc2022/Dockerfile
+      password:
+        from_secret: docker_password
+      repo: rancher/golang
+      tag: 1.16-windowsservercore-ltsc2022
+      username:
+        from_secret: docker_username
+    volumes:
+      - name: docker_pipe
+        path: \\\\.\\pipe\\docker_engine
+    when:
+      event:
+        - pull_request
+
+  - name: docker-publish
+    image: rancher/drone-images:docker-amd64-ltsc2022
+    settings:
+      purge: false
+      context: 1.16/windows/windowsservercore-ltsc2022
+      custom_dns: 1.1.1.1
+      dockerfile: 1.16/windows/windowsservercore-ltsc2022/Dockerfile
+      password:
+        from_secret: docker_password
+      repo: rancher/golang
+      tag: 1.16-windowsservercore-ltsc2022
+      username:
+        from_secret: docker_username
+    volumes:
+      - name: docker_pipe
+        path: \\\\.\\pipe\\docker_engine
+    when:
+      event:
+        - push
+      instance:
+        - drone-publish.rancher.io
+      ref:
+        - refs/heads/master
+
+volumes:
+  - name: docker_pipe
+    host:
+      path: \\\\.\\pipe\\docker_engine
+
+---
+kind: pipeline
+type: docker
 name: manifests-go116
 
 platform:
@@ -155,6 +225,7 @@ depends_on:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go115-1809
 
 platform:
@@ -215,6 +286,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go115-20H2
 
 platform:
@@ -228,9 +300,9 @@ clone:
 
 steps:
   - name: clone
-    image: luthermonson/drone-git:windows-20H2-amd64
+    image: rancher/drone-images:git-20H2
   - name: docker-ci
-    image: luthermonson/drone-docker:20H2
+    image: rancher/drone-images:docker-20H2
     settings:
       dry_run: true
       purge: false
@@ -251,7 +323,7 @@ steps:
         - pull_request
 
   - name: docker-publish
-    image: luthermonson/drone-docker:20H2
+    image: rancher/drone-images:docker-20H2
     settings:
       purge: false
       context: 1.15/windows/windowsservercore-20H2
@@ -279,9 +351,9 @@ volumes:
     host:
       path: \\\\.\\pipe\\docker_engine
 
-
 ---
 kind: pipeline
+type: docker
 name: manifests-go115
 
 platform:
@@ -311,6 +383,7 @@ depends_on:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go114-1809
 
 platform:
@@ -371,6 +444,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go114-20H2
 
 platform:
@@ -438,6 +512,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: manifests-go114
 
 platform:
@@ -467,6 +542,7 @@ depends_on:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go113-1809
 
 platform:
@@ -527,6 +603,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go113-20H2
 
 platform:
@@ -592,6 +669,7 @@ volumes:
       path: \\\\.\\pipe\\docker_engine
 ---
 kind: pipeline
+type: docker
 name: manifests-go113
 
 platform:
@@ -621,6 +699,7 @@ depends_on:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go112-1809
 
 platform:
@@ -681,6 +760,7 @@ volumes:
 
 ---
 kind: pipeline
+type: docker
 name: windows-go112-20H2
 
 platform:
@@ -746,6 +826,7 @@ volumes:
       path: \\\\.\\pipe\\docker_engine
 ---
 kind: pipeline
+type: docker
 name: manifests-go112
 
 platform:
